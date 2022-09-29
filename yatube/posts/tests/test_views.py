@@ -81,7 +81,7 @@ class PostPagesTests(TestCase):
         """Шаблон post_detail.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(self.post_detail_reverse)
         self.post_info_massage(response.context['post'])
-    
+
     def test_index_page_cache(self):
         """Записть хранится в кеше 20 секунд или до очистки кэша."""
         test_post = Post.objects.create(
@@ -150,8 +150,6 @@ class PostPagesTests(TestCase):
         response = self.authorized_unfollower_user.get(self.follow_reverse)
         first_object = len(response.context['page_obj'])
         self.assertEqual(first_object, 0)
-
-    
 
 
 class PaginatorViewsTest(TestCase):
