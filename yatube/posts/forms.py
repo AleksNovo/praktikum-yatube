@@ -7,7 +7,7 @@ from .models import Post, Comment
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('text', 'group','image')
+        fields = ('text', 'group', 'image')
         labels = {
             'text': _('Текст поста *'),
             'group': _('Группа поста'),
@@ -24,6 +24,7 @@ class PostForm(forms.ModelForm):
         widgets = {
             'text': forms.Textarea(attrs={'cols': 79, 'rows': 10}),
         }
+
 
 class CommentForm(forms.ModelForm):
     class Meta:
