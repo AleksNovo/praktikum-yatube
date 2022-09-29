@@ -68,6 +68,7 @@ class Comment(models.Model):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 
+
 class Follow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name="follower")
@@ -81,5 +82,3 @@ class Follow(models.Model):
                 name='unique_followings'
             )
         ]
-
-   
