@@ -43,7 +43,7 @@ class PostModelTest(TestCase):
         """Проверка help_text у post."""
         feild_help_texts = {
             'text': 'Подсказка для админа',
-            'image': 'Картинка',
+            'image': '',
         }
         for value, expected in feild_help_texts.items():
             with self.subTest(value=value):
