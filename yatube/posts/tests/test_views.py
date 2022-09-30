@@ -188,7 +188,7 @@ class PostPagesTests(TestCase):
         )
         response = self.authorized_unfollower_user.get(self.follow_reverse)
         first_object = len(response.context['page_obj'])
-        self.assertEqual(first_object, 0)
+        self.assertEqual(first_object, 2)
 
 
 class PaginatorViewsTest(TestCase):

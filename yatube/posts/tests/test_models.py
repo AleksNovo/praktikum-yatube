@@ -42,7 +42,7 @@ class PostModelTest(TestCase):
     def test_post_help_text(self):
         """Проверка help_text у post."""
         feild_help_texts = {
-            'text': 'Текст нового поста',
+            'text': 'Подсказка для админа',
             'group': 'Группа к которой относится пост',
             'image': 'Картинка'
         }
@@ -72,7 +72,7 @@ class GroupModelTest(TestCase):
     def test_group_verbose_name(self):
         """Проверка verbose_name у group."""
         field_verboses = {
-            'title': 'Заголовок',
+            'title': 'Название',
             'slug': 'text-slug',
             'description': 'Описание',
         }
