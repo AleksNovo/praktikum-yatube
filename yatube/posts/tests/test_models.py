@@ -28,7 +28,7 @@ class PostModelTest(TestCase):
     def test_post_verbose_name(self):
         """Проверка verbose_name у post."""
         field_verboses = {
-            'text': 'Текст поста',
+            'text': 'Текст',
             'pub_date': 'Дата публикации',
             'author': 'Автор',
             'group': 'Group',
@@ -42,7 +42,7 @@ class PostModelTest(TestCase):
     def test_post_help_text(self):
         """Проверка help_text у post."""
         feild_help_texts = {
-            'text': 'Подсказка для админа',
+            'text': 'Группа к которой относится пост',
             'group': 'Группа к которой относится пост',
             'image': 'Картинка'
         }
@@ -73,7 +73,7 @@ class GroupModelTest(TestCase):
         """Проверка verbose_name у group."""
         field_verboses = {
             'title': 'Название',
-            'slug': 'text-slug',
+            'slug': 'URL-Адрес',
             'description': 'Описание',
         }
         for value, expected in field_verboses.items():
