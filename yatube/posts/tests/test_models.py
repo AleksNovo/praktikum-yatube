@@ -31,7 +31,7 @@ class PostModelTest(TestCase):
             'text': 'Текст',
             'pub_date': 'Дата публикации',
             'author': 'Автор',
-            'group': 'Group',
+            'group': 'Группа',
             'image': 'Картинка',
         }
         for value, expected in field_verboses.items():
@@ -43,7 +43,7 @@ class PostModelTest(TestCase):
         """Проверка help_text у post."""
         feild_help_texts = {
             'text': 'Группа к которой относится пост',
-            'group': 'Группа к которой относится пост',
+            'group': 'Подсказка для админа',
             'image': 'Картинка'
         }
         for value, expected in feild_help_texts.items():
