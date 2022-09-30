@@ -1,16 +1,38 @@
-from django.test import Client, TestCase
+import shutil
+import tempfile
+
+from django.conf import settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from ..models import Follow, Post, Group, User
 from yatube.settings import PAG_NUM
+
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
 class PostPagesTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif'
+        )
         cls.user = User.objects.create_user(username='Name')
+        cls.leo_user = User.objects.create_user(username='Leo')
+        cls.unfollower_user = User.objects.create_user(username='Mark')
         cls.group = Group.objects.create(
             title='Тестовое заголовок',
             slug='test-slug',
@@ -21,6 +43,7 @@ class PostPagesTests(TestCase):
             text='Текст',
             author=cls.user,
             group=cls.group,
+            image=uploaded,
         )
         cls.index_reverse = reverse('posts:index')
         cls.group_list_reverse = reverse('posts:group_list',
@@ -32,10 +55,26 @@ class PostPagesTests(TestCase):
         cls.post_edit_reverse = reverse('posts:post_edit',
                                         kwargs={'post_id': cls.post.id})
         cls.post_create_reverse = reverse('posts:post_create')
+        cls.profile_follow_reverse = reverse('posts:profile_follow',
+                                             kwargs={'username':
+                                                     cls.leo_user.username})
+        cls.profile_unfollow_reverse = reverse('posts:profile_unfollow',
+                                               kwargs={'username':
+                                                       cls.leo_user.username})
+        cls.follow_reverse = reverse('posts:follow_index')
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def setUp(self):
         self.authorized_client = Client()
+        self.authorized_leo_user = Client()
+        self.authorized_unfollower_user = Client()
         self.authorized_client.force_login(self.user)
+        self.authorized_leo_user.force_login(self.leo_user)
+        self.authorized_unfollower_user.force_login(self.unfollower_user)
 
     def post_info_massage(self, context):
         with self.subTest(context=context):
