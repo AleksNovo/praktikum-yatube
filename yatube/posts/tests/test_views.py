@@ -2,7 +2,7 @@ import shutil
 import tempfile
 
 from django.conf import settings
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
