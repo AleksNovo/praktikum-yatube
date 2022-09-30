@@ -42,8 +42,8 @@ class PostModelTest(TestCase):
     def test_post_help_text(self):
         """Проверка help_text у post."""
         feild_help_texts = {
-            'text': 'Группа к которой относится пост',
-            'group': 'Подсказка для админа',
+            'text': 'Подсказка для админа',
+            'group': 'Группа к которой относится пост',
             'image': 'Картинка'
         }
         for value, expected in feild_help_texts.items():

@@ -92,7 +92,7 @@ class PostCreateFormTests(TestCase):
             added_post.text: self.form_data['text'],
             added_post.group.pk: self.form_data['group'],
             added_post.author: self.form_data['author'],
-            added_post.image: 'posts/' + self.uploaded.name,
+            added_post.image: 'posts/small.gif' + self.uploaded.name,
         }
         self.assertRedirects(response, reverse('posts:profile',
                              kwargs={'username':
