@@ -34,8 +34,9 @@ class URLTests(TestCase):
         cls.profile_unfollow = f'/profile/{cls.post.author}/unfollow/'
         cls.free_access_url_list = [cls.index_url, cls.group_url,
                                     cls.profile_url, cls.post_url]
-        cls.restricted_access_url_list = [cls.create_url, cls.edit_url,cls.add_comment,
-                                          cls.add_comment, cls.profile_follow, 
+        cls.restricted_access_url_list = [cls.create_url, cls.edit_url,
+                                          cls.add_comment, cls.add_comment,
+                                          cls.profile_follow,
                                           cls.profile_unfollow]
         cls.free_access_page_templates = ['posts/index.html',
                                           'posts/group_list.html',

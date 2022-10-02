@@ -138,6 +138,7 @@ class PostPagesTests(TestCase):
                             self.authorized_client.get(self.index_reverse).
                             content)
 
+
 class FollowingTest(TestCase):
     """Класс тестирования подписок."""
     @classmethod
