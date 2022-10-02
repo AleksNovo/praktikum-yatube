@@ -33,7 +33,7 @@ class URLTests(TestCase):
         cls.profile_follow_url = f'/profile/{cls.post.author}/follow/'
         cls.free_access_url_list = [cls.index_url, cls.group_url,
                                     cls.profile_url, cls.post_url,
-                                    cls.add_comment_url, 
+                                    cls.add_comment_url,
                                     cls.profile_follow_url]
         cls.restricted_access_url_list = [cls.create_url, cls.edit_url]
         cls.free_access_page_templates = ['posts/index.html',
