@@ -29,9 +29,14 @@ class URLTests(TestCase):
         cls.post_url = f'/posts/{cls.post.id}/'
         cls.create_url = '/create/'
         cls.edit_url = f'/posts/{cls.post.id}/edit/'
+        cls.add_comment = f'/posts/{cls.post.id}/comment/'
+        cls.profile_follow = f'/profile/{cls.post.author}/follow/'
+        cls.profile_unfollow = f'/profile/{cls.post.author}/unfollow/'
         cls.free_access_url_list = [cls.index_url, cls.group_url,
                                     cls.profile_url, cls.post_url]
-        cls.restricted_access_url_list = [cls.create_url, cls.edit_url]
+        cls.restricted_access_url_list = [cls.create_url, cls.edit_url,cls.add_comment,
+                                          cls.add_comment, cls.profile_follow, 
+                                          cls.profile_unfollow]
         cls.free_access_page_templates = ['posts/index.html',
                                           'posts/group_list.html',
                                           'posts/profile.html',

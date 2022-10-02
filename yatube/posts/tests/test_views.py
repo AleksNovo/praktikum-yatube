@@ -138,57 +138,43 @@ class PostPagesTests(TestCase):
                             self.authorized_client.get(self.index_reverse).
                             content)
 
-    def test_authorized_user_can_follow(self):
-        """Авторизованный пользователь может подписаться на автора."""
-        self.authorized_client.post(self.profile_follow_reverse)
-        follow_object = Follow.objects.filter(user=self.user,
-                                              author=self.leo_user).exists()
-        self.assertTrue(follow_object)
-
-    def test_authorized_user_can_unfollow(self):
-        """Авторизованный пользователь может отписаться от автора."""
-        Follow.objects.create(user=self.user, author=self.leo_user)
-        self.authorized_client.post(self.profile_unfollow_reverse)
-        follow_object = Follow.objects.filter(user=self.user,
-                                              author=self.leo_user).exists()
-        self.assertFalse(follow_object)
-
-    def test_authorized_user_can_not_follow_himself(self):
-        """Авторизованный пользователь не может подписаться на себя."""
-        self.authorized_client.post(self.profile_follow_reverse)
-        follow_object = Follow.objects.filter(user=self.user,
-                                              author=self.user).exists()
-        self.assertFalse(follow_object)
-
-    def test_follow_page_show_correct_context(self):
-        """Новая запись появляется в ленте того, кто подписан на автора."""
-        Follow.objects.create(user=self.user, author=self.leo_user)
-        post_for_follower = Post.objects.create(
-            text='Тестовый текст для подписчика',
-            author=self.leo_user,
-            group=self.group,
+class FollowingTest(TestCase):
+    """Класс тестирования подписок."""
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.post = Post.objects.create(
+            author=User.objects.create_user(username='auth'),
+            text='Тестовый пост',
         )
-        response = self.authorized_client.get(self.follow_reverse)
-        first_object = response.context['page_obj'][0]
-        follow_index_dict = {
-            first_object.text: post_for_follower.text,
-            first_object.author: self.leo_user,
-            first_object.group: self.group,
-        }
-        self._test_context_on_page(follow_index_dict)
 
-    def test_follow_page_show_correct_context(self):
-        """Новая запись не появляется в ленте того,
-        кто не подписан на автора."""
-        Follow.objects.create(user=self.user, author=self.leo_user)
-        Post.objects.create(
-            text='Тестовый текст для подписчика',
-            author=self.leo_user,
-            group=self.group,
+    def setUp(self):
+        self.user = User.objects.create_user(username='noname')
+        self.authorised_client = Client()
+        self.authorised_client.force_login(self.user)
+        self.author_client = Client()
+        self.author_client.force_login(self.post.author)
+        self.user_other = User.objects.create_user(username='other')
+        self.authorised_other_client = Client()
+        self.authorised_other_client.force_login(self.user_other)
+
+        Follow.objects.create(
+            user=self.user_other, author=self.post.author
         )
-        response = self.authorized_unfollower_user.get(self.follow_reverse)
-        first_object = len(response.context['page_obj'])
-        self.assertEqual(first_object, 0)
+        Follow.objects.create(
+            user=self.post.author, author=self.user
+        )
+        self.new_post = Post.objects.create(
+            author=self.user,
+            text='Новый пост автора',
+        )
+        self.response = self.author_client.get(reverse('posts:follow_index'))
+        self.response_other = self.authorised_other_client.get(
+            reverse('posts:follow_index')
+        )
+
+        self.first_object = self.response.context['page_obj'][0]
+        self.first_object_other = self.response_other.context['page_obj'][0]
 
 
 class PaginatorViewsTest(TestCase):

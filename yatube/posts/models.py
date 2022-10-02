@@ -24,10 +24,6 @@ class Post(models.Model):
         upload_to='posts/',
         blank=True
     )
-
-    class Meta:
-        ordering = ['-pub_date']
-
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -43,6 +39,9 @@ class Post(models.Model):
         help_text='Подсказка для админа',
         verbose_name='Группа'
     )
+
+    class Meta:
+        ordering = ['-pub_date']
 
     def __str__(self):
         return self.text[:15]
@@ -71,9 +70,9 @@ class Comment(models.Model):
 
 class Follow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name="follower")
+                             related_name='follower')
     author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name="following")
+                               related_name='following')
 
     class Meta:
         constraints = [

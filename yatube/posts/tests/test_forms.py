@@ -37,7 +37,6 @@ class PostCreateFormTests(TestCase):
             post=cls.post,
             author=cls.user
         )
-        cls.form = PostForm()
 
     @classmethod
     def tearDownClass(cls):
