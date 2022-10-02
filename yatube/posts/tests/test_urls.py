@@ -29,11 +29,12 @@ class URLTests(TestCase):
         cls.post_url = f'/posts/{cls.post.id}/'
         cls.create_url = '/create/'
         cls.edit_url = f'/posts/{cls.post.id}/edit/'
-        cls.profile_follow = f'/profile/{cls.post.author}/follow/'
+        cls.add_comment_url = f'/posts/{cls.post.id}/comment/'
+        cls.profile_follow_url = f'/profile/{cls.post.author}/follow/'
         cls.free_access_url_list = [cls.index_url, cls.group_url,
-                                    cls.profile_url, cls.post_url]
-        cls.restricted_access_url_list = [cls.create_url, cls.edit_url,
-                                          cls.profile_follow]
+                                    cls.profile_url, cls.post_url
+                                    cls.add_comment_url, cls.profile_follow_url]
+        cls.restricted_access_url_list = [cls.create_url, cls.edit_url]
         cls.free_access_page_templates = ['posts/index.html',
                                           'posts/group_list.html',
                                           'posts/profile.html',
@@ -41,7 +42,6 @@ class URLTests(TestCase):
         cls.restricted_access_page_templates = [
             'posts/create_post.html',
             'posts/create_post.html',
-            'profile/<str:username>/follow/'
         ]
 
     def setUp(self):
