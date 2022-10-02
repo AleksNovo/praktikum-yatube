@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
+from django.core.cache import cache
 
 from http import HTTPStatus
 
@@ -29,26 +30,28 @@ class URLTests(TestCase):
         cls.post_url = f'/posts/{cls.post.id}/'
         cls.create_url = '/create/'
         cls.edit_url = f'/posts/{cls.post.id}/edit/'
-        cls.add_comment_url = f'/posts/{cls.post.id}/comment/'
-        cls.profile_follow_url = f'/profile/{cls.post.author}/follow/'
+        cls.comment_url = f'/posts/{cls.post.id}/comment/'
+        cls.follow_url = '/follow/'
+        cls.profile_follow_url = f'/profile/{cls.user.username}/follow/'
+        cls.profile_unfollow_url = f'/profile/{cls.user.username}/unfollow/'
         cls.free_access_url_list = [cls.index_url, cls.group_url,
                                     cls.profile_url, cls.post_url]
-        cls.restricted_access_url_list = [cls.create_url, cls.edit_url,
-                                          cls.add_comment_url,
-                                          cls.profile_follow_url]
+        cls.restricted_access_url_list = [cls.create_url,
+                                          cls.edit_url,
+                                          cls.follow_url]
         cls.free_access_page_templates = ['posts/index.html',
                                           'posts/group_list.html',
                                           'posts/profile.html',
                                           'posts/post_detail.html']
-        cls.restricted_access_page_templates = [
-            'posts/create_post.html',
-            'posts/create_post.html',
-        ]
+        cls.restricted_access_page_templates = ['posts/create_post.html',
+                                                'posts/create_post.html',
+                                                'posts/follow.html']
 
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        cache.clear()
 
     # Проверяем общедоступные страницы
     def test_free_access_pages(self):
@@ -66,6 +69,8 @@ class URLTests(TestCase):
             with self.subTest(url=url):
                 response = self.authorized_client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
+        response = self.authorized_client.get(self.comment_url)
+        self.assertRedirects(response, self.post_url)
 
     def test_restricted_access_pages_redirect(self):
         """Страницы /create/ и /posts/<post_id>/edit/> перенаправляют
@@ -74,6 +79,8 @@ class URLTests(TestCase):
             with self.subTest(url=url):
                 response = self.guest_client.get(url, follow=True)
                 self.assertRedirects(response, f'/auth/login/?next={url}')
+        response = self.guest_client.get(self.comment_url)
+        self.assertRedirects(response, f'/auth/login/?next={self.comment_url}')
 
     def test_create_redirects_not_author(self):
         """Страница /posts/<post_id>/edit/> перенаправляет
@@ -108,3 +115,10 @@ class URLTests(TestCase):
         url = '/unexisting_page/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_custom_error_pages(self):
+        """При запросе неусществующего URL-адреса
+        срабатывает наша ошибка 404."""
+        url = '/unexisting_page/'
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'core/404.html')
