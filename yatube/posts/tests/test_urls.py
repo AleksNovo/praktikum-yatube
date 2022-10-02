@@ -41,7 +41,9 @@ class URLTests(TestCase):
                                           'posts/profile.html',
                                           'posts/post_detail.html']
         cls.restricted_access_page_templates = ['posts/create_post.html',
-                                                'posts/create_post.html']
+                                                'posts/create_post.html',
+                                                'posts/<int:post_id>/comment/',
+                                                'profile/<str:username>/follow/']
 
     def setUp(self):
         self.guest_client = Client()
