@@ -43,8 +43,6 @@ class URLTests(TestCase):
         cls.restricted_access_page_templates = [
             'posts/create_post.html',
             'posts/create_post.html',
-            'posts/<int:post_id>/comment/',
-            'profile/<str:username>/follow/'
         ]
 
     def setUp(self):
@@ -64,9 +62,9 @@ class URLTests(TestCase):
     def test_restricted_access_pages(self):
         """Страницы /create/ и /posts/<post_id>/edit/>
         доступны только авторизованным пользователям."""
-        for url in self.restricted_access_url_list:
-            with self.subTest(url=url):
-                response = self.authorized_client.get(url)
+        for url in self.restricted_access_url_list: 
+            with self.subTest(url=url): 
+                response = self.authorized_client.get(url) 
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_restricted_access_pages_redirect(self):
