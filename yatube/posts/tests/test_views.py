@@ -195,6 +195,7 @@ class PostPagesTests(TestCase):
         first_object = len(response.context['page_obj'])
         self.assertEqual(first_object, 0)
 
+
 class FollowingTest(TestCase):
     """Класс тестирования подписок."""
     @classmethod

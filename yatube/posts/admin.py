@@ -40,7 +40,6 @@ class CommentAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-
 class FollowAdmin(admin.ModelAdmin):
     """Класс для настройки отображения модели
      Follow в интерфейсе админки."""
@@ -50,6 +49,7 @@ class FollowAdmin(admin.ModelAdmin):
     )
     search_fields = ('follow',)
     empty_value_display = '-пусто-'
+
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Group, GroupAdmin)
