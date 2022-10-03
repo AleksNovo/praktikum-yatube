@@ -99,6 +99,11 @@ class PostPagesTests(TestCase):
                 response = self.authorized_client.get(adress)
                 self.assertTemplateUsed(response, template)
 
+    def _test_context_on_page(self, dict):
+        for expected, real in dict.items():
+            with self.subTest(expected=expected):
+                return self.assertEqual(expected, real)
+
     def test_home_page_show_correct_context(self):
         """Шаблон home.html сформирован с правильным контекстом."""
         response = self.authorized_client.get(self.index_reverse)
@@ -138,6 +143,57 @@ class PostPagesTests(TestCase):
                             self.authorized_client.get(self.index_reverse).
                             content)
 
+    def test_authorized_user_can_follow(self):
+        """Авторизованный пользователь может подписаться на автора."""
+        self.authorized_client.post(self.profile_follow_reverse)
+        follow_object = Follow.objects.filter(user=self.user,
+                                              author=self.leo_user).exists()
+        self.assertTrue(follow_object)
+
+    def test_authorized_user_can_unfollow(self):
+        """Авторизованный пользователь может отписаться от автора."""
+        Follow.objects.create(user=self.user, author=self.leo_user)
+        self.authorized_client.post(self.profile_unfollow_reverse)
+        follow_object = Follow.objects.filter(user=self.user,
+                                              author=self.leo_user).exists()
+        self.assertFalse(follow_object)
+
+    def test_authorized_user_can_not_follow_himself(self):
+        """Авторизованный пользователь не может подписаться на себя."""
+        self.authorized_client.post(self.profile_follow_reverse)
+        follow_object = Follow.objects.filter(user=self.user,
+                                              author=self.user).exists()
+        self.assertFalse(follow_object)
+
+    def test_follow_page_show_correct_context(self):
+        """Новая запись появляется в ленте того, кто подписан на автора."""
+        Follow.objects.create(user=self.user, author=self.leo_user)
+        post_for_follower = Post.objects.create(
+            text='Тестовый текст для подписчика',
+            author=self.leo_user,
+            group=self.group,
+        )
+        response = self.authorized_client.get(self.follow_reverse)
+        first_object = response.context['page_obj'][0]
+        follow_index_dict = {
+            first_object.text: post_for_follower.text,
+            first_object.author: self.leo_user,
+            first_object.group: self.group,
+        }
+        self._test_context_on_page(follow_index_dict)
+
+    def test_follow_page_show_correct_context(self):
+        """Новая запись не появляется в ленте того,
+        кто не подписан на автора."""
+        Follow.objects.create(user=self.user, author=self.leo_user)
+        Post.objects.create(
+            text='Тестовый текст для подписчика',
+            author=self.leo_user,
+            group=self.group,
+        )
+        response = self.authorized_unfollower_user.get(self.follow_reverse)
+        first_object = len(response.context['page_obj'])
+        self.assertEqual(first_object, 0)
 
 class FollowingTest(TestCase):
     """Класс тестирования подписок."""
