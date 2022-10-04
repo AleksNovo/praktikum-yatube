@@ -31,8 +31,6 @@ class PostPagesTests(TestCase):
             content_type='image/gif'
         )
         cls.user = User.objects.create_user(username='Name')
-        cls.leo_user = User.objects.create_user(username='Leo')
-        cls.unfollower_user = User.objects.create_user(username='Mark')
         cls.group = Group.objects.create(
             title='Тестовое заголовок',
             slug='test-slug',
@@ -55,13 +53,6 @@ class PostPagesTests(TestCase):
         cls.post_edit_reverse = reverse('posts:post_edit',
                                         kwargs={'post_id': cls.post.id})
         cls.post_create_reverse = reverse('posts:post_create')
-        cls.profile_follow_reverse = reverse('posts:profile_follow',
-                                             kwargs={'username':
-                                                     cls.leo_user.username})
-        cls.profile_unfollow_reverse = reverse('posts:profile_unfollow',
-                                               kwargs={'username':
-                                                       cls.leo_user.username})
-        cls.follow_reverse = reverse('posts:follow_index')
 
     @classmethod
     def tearDownClass(cls):
@@ -73,8 +64,6 @@ class PostPagesTests(TestCase):
         self.authorized_leo_user = Client()
         self.authorized_unfollower_user = Client()
         self.authorized_client.force_login(self.user)
-        self.authorized_leo_user.force_login(self.leo_user)
-        self.authorized_unfollower_user.force_login(self.unfollower_user)
 
     def post_info_massage(self, context):
         with self.subTest(context=context):
@@ -98,11 +87,6 @@ class PostPagesTests(TestCase):
             with self.subTest(adress=adress):
                 response = self.authorized_client.get(adress)
                 self.assertTemplateUsed(response, template)
-
-    def _test_context_on_page(self, dict):
-        for expected, real in dict.items():
-            with self.subTest(expected=expected):
-                return self.assertEqual(expected, real)
 
     def test_home_page_show_correct_context(self):
         """Шаблон home.html сформирован с правильным контекстом."""
@@ -142,6 +126,45 @@ class PostPagesTests(TestCase):
         self.assertNotEqual(response,
                             self.authorized_client.get(self.index_reverse).
                             content)
+
+   
+class FollowingTest(TestCase):
+    """Класс тестирования подписок."""
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.group = Group.objects.create(
+            title='Тестовое заголовок',
+            slug='test-slug',
+            description='Тестовое описание',
+        )
+        cls.post = Post.objects.create(
+            author=User.objects.create_user(username='auth'),
+            text='Тестовый пост',
+        )
+        cls.user = User.objects.create_user(username='Name')
+        cls.leo_user = User.objects.create_user(username='Leo')
+        cls.unfollower_user = User.objects.create_user(username='Mark')
+        cls.profile_follow_reverse = reverse('posts:profile_follow',
+                                             kwargs={'username':
+                                                     cls.leo_user.username})
+        cls.profile_unfollow_reverse = reverse('posts:profile_unfollow',
+                                               kwargs={'username':
+                                                       cls.leo_user.username})
+        cls.follow_reverse = reverse('posts:follow_index')
+
+    def setUp(self):
+        self.authorized_client = Client()
+        self.authorized_leo_user = Client()
+        self.authorized_unfollower_user = Client()
+        self.authorized_client.force_login(self.user)
+        self.authorized_leo_user.force_login(self.leo_user)
+        self.authorized_unfollower_user.force_login(self.unfollower_user)
+
+    def _test_context_on_page(self, dict):
+        for expected, real in dict.items():
+            with self.subTest(expected=expected):
+                return self.assertEqual(expected, real)
 
     def test_authorized_user_can_follow(self):
         """Авторизованный пользователь может подписаться на автора."""
@@ -194,46 +217,6 @@ class PostPagesTests(TestCase):
         response = self.authorized_unfollower_user.get(self.follow_reverse)
         first_object = len(response.context['page_obj'])
         self.assertEqual(first_object, 0)
-
-
-class FollowingTest(TestCase):
-    """Класс тестирования подписок."""
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.post = Post.objects.create(
-            author=User.objects.create_user(username='auth'),
-            text='Тестовый пост',
-        )
-
-    def setUp(self):
-        self.user = User.objects.create_user(username='noname')
-        self.authorised_client = Client()
-        self.authorised_client.force_login(self.user)
-        self.author_client = Client()
-        self.author_client.force_login(self.post.author)
-        self.user_other = User.objects.create_user(username='other')
-        self.authorised_other_client = Client()
-        self.authorised_other_client.force_login(self.user_other)
-
-        Follow.objects.create(
-            user=self.user_other, author=self.post.author
-        )
-        Follow.objects.create(
-            user=self.post.author, author=self.user
-        )
-        self.new_post = Post.objects.create(
-            author=self.user,
-            text='Новый пост автора',
-        )
-        self.response = self.author_client.get(reverse('posts:follow_index'))
-        self.response_other = self.authorised_other_client.get(
-            reverse('posts:follow_index')
-        )
-
-        self.first_object = self.response.context['page_obj'][0]
-        self.first_object_other = self.response_other.context['page_obj'][0]
-
 
 class PaginatorViewsTest(TestCase):
     @classmethod
