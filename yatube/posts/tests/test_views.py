@@ -127,7 +127,7 @@ class PostPagesTests(TestCase):
                             self.authorized_client.get(self.index_reverse).
                             content)
 
-   
+
 class FollowingTest(TestCase):
     """Класс тестирования подписок."""
     @classmethod
@@ -217,6 +217,7 @@ class FollowingTest(TestCase):
         response = self.authorized_unfollower_user.get(self.follow_reverse)
         first_object = len(response.context['page_obj'])
         self.assertEqual(first_object, 0)
+
 
 class PaginatorViewsTest(TestCase):
     @classmethod
